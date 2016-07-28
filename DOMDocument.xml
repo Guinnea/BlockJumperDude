@@ -133,7 +133,7 @@ player.jumpSpeed;
 function monitorKeyboardState(e:Event):void 
 {
 	//////////////////////////////////////////
-	//										//
+	//		STEP BY STEP					//
 	//										//
 	//										//
 	// 				MOVEMENT				//
