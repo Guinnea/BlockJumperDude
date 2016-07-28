@@ -1,0 +1,741 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="800" height="800" frameRate="30" currentTimeline="1" xflVersion="2.6" creatorInfo="Adobe Flash Professional CC" platform="Windows" versionInfo="Saved by Adobe Flash Windows 15.0 build 173" majorVersion="15" buildNumber="173" guidesVisible="false" timelineLabelWidth="241" viewAngle3D="74.2651684569298" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" filetypeGUID="DD0DDBBF-5BEF-45B2-9F24-A3048D2A676F">
+     <fonts>
+          <DOMFontItem name="Font 1" itemID="57324e8a-00000043" linkageExportForAS="true" linkageBaseClass="flash.text.Font" linkageClassName="Font1" font="ArialMT" size="0" id="1" sourceLastImported="1465772178" embeddedCharacters="." embedRanges="1|2|3|4"/>
+     </fonts>
+     <symbols>
+          <Include href="corner.xml" itemID="57759ae7-00000010" lastModified="1467326671"/>
+          <Include href="dude.xml" itemID="572901cb-0000001d" lastModified="1462916712"/>
+          <Include href="EditorMenu.xml" itemID="573244f6-00000018" lastModified="1464912807"/>
+          <Include href="menuButtonClose.xml" itemIcon="0" loadImmediate="false" itemID="573249cb-00000035" lastModified="1462913483"/>
+          <Include href="menuButtonOpen.xml" itemIcon="0" loadImmediate="false" itemID="573249c2-00000034" lastModified="1462913509"/>
+          <Include href="world.xml" itemID="5728f764-00000005" lastModified="1463524962"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Scene" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Master Script" color="#00FF00" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import fl.motion.MotionEvent;
+import flash.events.MouseEvent;
+
+/**************************************/
+/** 		Master script			 **/
+/**************************************/
+
+openEditor.addEventListener(MouseEvent.CLICK, openEditorMenu);
+
+var editorMenu:EditorMenu_ = new EditorMenu_;
+editorMenu.closeMenu.addEventListener(MouseEvent.CLICK, closeEditorMenu);
+
+editorMenu.visible = false;
+editorMenu.x=5;
+editorMenu.y=5;
+
+
+stage.addChild(editorMenu);
+
+// when the menu is closed.
+var changeMade = false;
+
+function openEditorMenu(e:MouseEvent):void {
+	editorMenu.visible = true;
+}
+
+function closeEditorMenu(e:MouseEvent):void{
+	editorMenu.visible = false;
+	changeMade = true;
+}
+
+// player attributes
+var playerAttributes = {
+	rotationSpeed:Number(editorMenu.textPlayerSpeed.text),
+	leftDown:false,
+	rightDown:false,
+	ang:180,
+	jumpKey:false,
+	angleSpeed:Number(editorMenu.textPlayerSpeed.text)
+};
+
+// world attributes
+var worldAttributes = {
+	mass:Number(editorMenu.textWorldMass.text),
+	leftDown:false,
+	rightDown:false,
+	maxRotationSpeed:2,
+	rotationSpeed:0
+};
+
+var blockAttributes = {
+	w:0,
+	h:0,
+	id:-1,
+	lcorner:-1,
+	rcorner:-1,
+	r:-1
+};
+
+var cornerAttributes = {
+	id:-1,
+	r:-1
+}
+
+]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="menuButtonOpen" name="openEditor" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="70" ty="20"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Player Script" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import flash.events.Event;
+import flash.events.KeyboardEvent;
+
+var player:dude_ = new dude_;
+player.playerAttributes = playerAttributes;
+
+stage.addChild(player);
+
+stage.addEventListener(KeyboardEvent.KEY_DOWN, startPlayerSpin);
+stage.addEventListener(KeyboardEvent.KEY_UP, stopPlayerSpin) 
+stage.addEventListener(Event.ENTER_FRAME, monitorKeyboardState);
+
+player.x = 400;
+player.y = 135;
+player.relativeScreenSpeed = 0.0;
+player.maxHeight = 5;
+player.jumpHeight = 0;
+player.jumpReady = true;
+player.jumping = false;
+player.jumpSpeed;
+
+
+
+function monitorKeyboardState(e:Event):void 
+{
+	//////////////////////////////////////////
+	//										//
+	//										//
+	//										//
+	// 				MOVEMENT				//
+	//										//
+	//										//
+	//										//
+	//////////////////////////////////////////
+	
+	
+	player.relativeScreenSpeed = player.rotation;
+
+	//No Keys or Both Keys
+	if( (player.playerAttributes.rightDown == false && player.playerAttributes.leftDown == false && player.jumpReady == true) ||
+		(player.playerAttributes.rightDown == true && player.playerAttributes.leftDown == true && player.jumpReady == true))
+	{
+		if(World1.worldAttributes.rotationSpeed != 0)
+		player.playerAttributes.ang -= World1.worldAttributes.rotationSpeed;
+		
+		updatePlayerAngle();
+		player.rotation += World1.worldAttributes.rotationSpeed;
+	}
+	
+	//Left Key
+	else if(player.playerAttributes.leftDown == true && player.playerAttributes.rightDown == false)
+	{
+		player.playerAttributes.ang -= 
+		player.playerAttributes.angleSpeed + (World1.worldAttributes.rotationSpeed *(player.playerAttributes.rotationSpeed * 0.7));
+		
+		updatePlayerAngle();
+		player.rotation += player.playerAttributes.rotationSpeed + (World1.worldAttributes.rotationSpeed *(player.playerAttributes.rotationSpeed * 0.7));
+	}
+	
+	//Right Key
+	else if(player.playerAttributes.rightDown == true && player.playerAttributes.leftDown == false)
+	{
+		player.playerAttributes.ang += 
+		player.playerAttributes.angleSpeed - (World1.worldAttributes.rotationSpeed *(player.playerAttributes.rotationSpeed * 0.7));
+		
+		updatePlayerAngle();
+		
+		player.rotation -= player.playerAttributes.rotationSpeed - (World1.worldAttributes.rotationSpeed *(player.playerAttributes.rotationSpeed * 0.7));
+		editorMenu.playerSpeedOutput.text = player.playerAttributes.ang.toString();
+	}
+	
+	//Update amount of movement
+	player.relaiveScreenSpeed = Math.abs(player.relativeScreenSpeed - player.rotation);
+	
+		
+	//////////////////////////////////////////
+	//										//
+	//										//
+	//										//
+	//					JUMP				//
+	//										//
+	//										//
+	//										//
+	//////////////////////////////////////////
+	
+	if(player.playerAttributes.jumpKey == true && player.jumpHeight <= 0 && player.jumpReady == true)
+	{
+		player.jumpReady = false;
+		player.jumping = true;
+		player.jumpSpeed = player.relaiveScreenSpeed + 1;
+		player.tempMaxHeight = player.jumpSpeed * player.maxHeight;
+	}
+	
+	if (player.jumpReady == false)
+	{
+		if (player.jumping == true && player.jumpHeight <= player.tempMaxHeight)
+		{
+			player.jumpHeight += player.jumpSpeed;
+		}
+		else
+		{
+			player.jumping = false;
+		}
+		
+		if (player.jumping == false && player.jumpHeight > 0 && (player.jumpHeight - player.jumpSpeed) >=0)
+		{
+			player.jumpHeight -= player.jumpSpeed;
+		}
+		else if ((player.jumping == false && player.jumpHeight <= 0) ||
+				(player.jumping == false && player.jumpHeight > 0 && 
+				(player.jumpHeight - player.jumpSpeed) < 0))
+		{
+			player.jumpReady = true;
+			player.jumpHeight = 0;
+		}
+		
+		player.x = (Math.sin(AngleToRadians(player.playerAttributes.ang)) * (163 + (player.jumpHeight))) + 400;
+		player.y = (Math.cos(AngleToRadians(player.playerAttributes.ang)) * (163 + (player.jumpHeight))) + 400;
+	}
+}
+
+function stopPlayerSpin(e:KeyboardEvent):void
+{
+	if(e.keyCode == 39) 
+		player.playerAttributes.leftDown = false;		
+	if(e.keyCode == 37) 
+		player.playerAttributes.rightDown = false;	
+	if(e.keyCode == 32) 
+		player.playerAttributes.jumpKey = false;	
+	
+}
+
+function startPlayerSpin(e:KeyboardEvent):void
+{
+	if(e.keyCode == 39) 
+		player.playerAttributes.leftDown = true;		
+	if(e.keyCode == 37) 
+		player.playerAttributes.rightDown = true;
+	if(e.keyCode == 32) 
+		player.playerAttributes.jumpKey = true;	
+	
+}
+
+function updatePlayerAngle()
+{
+	if(player.playerAttributes.ang <=0)
+	{
+		player.playerAttributes.ang +=360;
+	} 
+	else if(player.playerAttributes.ang >360)
+	{
+		player.playerAttributes.ang -=360;
+	}
+	
+	player.x = (Math.sin(AngleToRadians(player.playerAttributes.ang)) * 163) + 400;
+	player.y = (Math.cos(AngleToRadians(player.playerAttributes.ang)) * 163) + 400;
+	
+	editorMenu.playerSpeedOutput.text = player.playerAttributes.ang.toString();
+}
+
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="World Script" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import flash.events.Event;
+import flash.events.KeyboardEvent;
+
+var World1:world_ = new world_;
+World1.worldAttributes = worldAttributes;
+stage.addChild(World1);
+
+stage.addEventListener(KeyboardEvent.KEY_DOWN, startWorldSpin);
+stage.addEventListener(KeyboardEvent.KEY_UP, stopWorldSpin);
+stage.addEventListener(Event.ENTER_FRAME, monitorWorldKeyboardState);
+
+World1.x = 400;
+World1.y = 400;
+
+function monitorWorldKeyboardState(e:Event):void 
+{
+	if ((World1.worldAttributes.leftDown == false && World1.worldAttributes.rightDown == false) ||
+		(World1.worldAttributes.leftDown == true && World1.worldAttributes.rightDown == true) || player.jumpReady == false)
+	{
+		
+		if(World1.worldAttributes.rotationSpeed < 0)
+		World1.worldAttributes.rotationSpeed += ((player.playerAttributes.rotationSpeed * 25) / World1.worldAttributes.mass);
+		
+		else if (World1.worldAttributes.rotationSpeed > 0)
+		World1.worldAttributes.rotationSpeed -= ((player.playerAttributes.rotationSpeed * 25) / World1.worldAttributes.mass);
+	}
+	else if (
+			World1.worldAttributes.rotationSpeed < World1.worldAttributes.maxRotationSpeed && 
+			World1.worldAttributes.rotationSpeed > -World1.worldAttributes.maxRotationSpeed &&
+			player.jumpReady == true)
+	{
+		if(World1.worldAttributes.leftDown == true)
+		{
+			World1.worldAttributes.rotationSpeed -= ((player.playerAttributes.rotationSpeed * 25) / World1.worldAttributes.mass);
+		}
+		if(World1.worldAttributes.rightDown == true)
+		{
+			World1.worldAttributes.rotationSpeed += ((player.playerAttributes.rotationSpeed * 25) / World1.worldAttributes.mass);
+		}
+	}
+	
+	if(World1.worldAttributes.rotationSpeed > 0.05 || World1.worldAttributes.rotationSpeed < -0.05)
+	{
+		World1.rotation += World1.worldAttributes.rotationSpeed;
+	}
+
+	editorMenu.worldSpeedOutput.text = World1.rotation.toString();
+}
+
+function stopWorldSpin(e:KeyboardEvent):void{
+	if(e.keyCode == 39) {
+		World1.worldAttributes.leftDown = false;		
+	}
+	if(e.keyCode == 37) {
+		World1.worldAttributes.rightDown = false;		
+	}
+}
+
+function startWorldSpin(e:KeyboardEvent):void{
+	if(e.keyCode == 39) {
+		World1.worldAttributes.leftDown = true;		
+	}
+	if(e.keyCode == 37) {
+		World1.worldAttributes.rightDown = true;		
+	}
+}
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Block Script" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import flash.events.Event;
+import flash.display.Sprite;
+import flash.display.MovieClip;
+import flash.geom.Point;
+
+stage.addEventListener(Event.ENTER_FRAME, addBlock);
+stage.addEventListener(Event.ENTER_FRAME, promptBlock);
+stage.addEventListener(Event.ENTER_FRAME, dropBlock);
+
+var blockCounter = 0;
+var nextBlock =(Math.random()*90)+30;
+var thisthat = 0;
+var prompt = false;
+var smallCount = -1;
+var largeCount = 0;
+var promptSprite:MovieClip;
+var oneTimeBool = true;
+var addNewBlock = false;
+var blockSprites=[];
+var newBlock:MovieClip;
+var curvedBlock:MovieClip;
+var corner:corner_;
+var corners = [];
+var circumfrence = [ [] , [] , [] , [] , [] , [] ];
+var totalCorners = 0;
+var totalBlocks = 0;
+var biggestRadius = 150;
+var rnum = 100;
+var aang = 0;
+var bang = 0;
+
+function dropBlock(e:Event):void {
+	if(addNewBlock == true){
+		
+		newBlock = new MovieClip();
+		drawSquareBlock( newBlock , 100 , 40 , 0.5 , 0x3C3C3C );
+		newBlock.addEventListener(Event.ENTER_FRAME, blockDropLogic);
+		newBlock.x = 400;
+		newBlock.y = -100;
+		newBlock.blockAttributes = blockAttributes;		
+		newBlock.blockAttributes.w = 100;
+		newBlock.blockAttributes.h = 40;
+		newBlock.blockAttributes.id = blockSprites.length - 1;
+		
+		blockSprites.push(newBlock);
+		addChild(blockSprites[blockSprites.length-1]);
+		addNewBlock = false;
+	}
+}
+
+function obtainAngle( a , b , c , l , s ){
+
+	if(a>0 || b>0){a=a-360; b=b-360;}
+	
+	var d = doThis( a );
+	var e = doThis( b );
+	var j = e-d;	
+	d = AngleToRadians( d );
+	e = AngleToRadians( e );	
+	var f = (e - d) * c;
+	var g = f - l;
+	var h = 1 - (g / f);
+	if( h<0 ){
+		h = h * -1;
+	}
+	var i = j*h;
+	var m = (j-i)/2;
+	d = RadiansToAngle( d );
+	e = RadiansToAngle( e );
+	d = d+m;
+	e = e-m;
+	d = doThat( d );
+	e = doThat( e );
+	if( s == 0 ){
+		d = Math.round( d * 4 ) / 4;
+		return d;
+	} else if( s == 1 ){
+		e = Math.round( e * 4 ) / 4;
+		return e;
+	}
+	
+}
+
+function blockDropLogic(e:Event):void {
+	
+	e.currentTarget.y +=15;
+	if(e.currentTarget.y >= 395 - biggestRadius){
+		if(totalBlocks < 1){
+			e.currentTarget.removeEventListener( Event.ENTER_FRAME , blockDropLogic );
+			removeChild( DisplayObject( e.currentTarget ) );
+			blockSprites.splice( e.currentTarget.blockAttributes.id , 1 );
+
+			newBlock = new MovieClip();
+			newBlock.blockAttributes = blockAttributes;
+			newBlock.blockAttributes.id = blockSprites.length - 1;
+			//rnum = (Math.random()*20)+90;
+			aang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , 150 , rnum , 0 );
+			bang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , 150 , rnum , 1 );
+			drawCurvedBlock( newBlock , 0 , 0 , 150 , aang , bang ,	40 , 0x3C3C3C );
+			newBlock.alpha = 0.5;			
+			blockSprites.push(newBlock);
+			World1.addChild(blockSprites[blockSprites.length-1]);
+			
+			corner = new corner_;
+			corner.cornerAttributes = cornerAttributes;
+			corner.cornerAttributes.name = "c" + totalCorners.toString();
+			corner.cornerAttributes.r = 150;
+			corner.x = newBlock.blockAttributes.lcorner.x;
+			corner.y = newBlock.blockAttributes.lcorner.y;
+			corners.push(corner)
+			World1.addChild(corners[corners.length -1]);
+			totalCorners++;
+			
+			corner = new corner_;
+			corner.cornerAttributes = cornerAttributes;
+			corner.cornerAttributes.name = "c" + totalCorners.toString();
+			corner.cornerAttributes.r = 150;
+			corner.x = newBlock.blockAttributes.rcorner.x;
+			corner.y = newBlock.blockAttributes.rcorner.y;
+			corners.push(corner)
+			World1.addChild(corners[corners.length -1]);
+			totalCorners++;
+			
+			totalBlocks++;
+		
+		} else {
+			var useThisRadius = 0;
+			var thisCount = corners.length;
+			var L1= localToGlobal(new Point( e.currentTarget.x - (e.currentTarget.width/2) , e.currentTarget.y - (e.currentTarget.height/2)));
+			var R1 = localToGlobal(new Point( e.currentTarget.x + (e.currentTarget.width/2) , e.currentTarget.y - (e.currentTarget.height/2)));
+			for(var i=0; i<thisCount; i+=2){
+				var L2 = corners[i].localToGlobal(new Point( 0 , 0 ));
+				var R2 = corners[i+1].localToGlobal(new Point( 0 , 0 ));
+				trace(L1.toString());
+				if( ( L1.x >= L2.x && L1.x <= R2.x ) || ( R1.x >= L2.x && R1.x <= R2.x ) ){
+					useThisRadius = corners[i].cornerAttributes.r + 40;
+					e.currentTarget.removeEventListener( Event.ENTER_FRAME , blockDropLogic );
+					removeChild( DisplayObject( e.currentTarget ) );
+					blockSprites.splice( e.currentTarget.blockAttributes.id , 1 );
+
+					newBlock = new MovieClip();
+					newBlock.blockAttributes = blockAttributes;
+					newBlock.blockAttributes.id = blockSprites.length - 1;
+					//rnum = (Math.random()*20)+90;
+					aang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , useThisRadius , rnum , 0 );
+					bang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , useThisRadius , rnum , 1 );
+					drawCurvedBlock( newBlock , 0 , 0 , useThisRadius , aang , bang ,	40 , 0x3C3C3C );
+					newBlock.alpha = 0.5;			
+					blockSprites.push(newBlock);
+					World1.addChild(blockSprites[blockSprites.length-1]);
+					
+					corner = new corner_;
+					corner.cornerAttributes = cornerAttributes;
+					corner.cornerAttributes.name = "c" + totalCorners.toString();
+					corner.cornerAttributes.r = useThisRadius;
+					corner.x = newBlock.blockAttributes.lcorner.x;
+					corner.y = newBlock.blockAttributes.lcorner.y;
+					corners.push(corner)
+					World1.addChild(corners[corners.length -1]);
+					totalCorners++;
+					
+					corner = new corner_;
+					corner.cornerAttributes = cornerAttributes;
+					corner.cornerAttributes.name = "c" + totalCorners.toString();
+					corner.cornerAttributes.r = useThisRadius;
+					corner.x = newBlock.blockAttributes.rcorner.x;
+					corner.y = newBlock.blockAttributes.rcorner.y;
+					corners.push(corner)
+					World1.addChild(corners[corners.length -1]);
+					totalCorners++;
+					
+					if(useThisRadius > biggestRadius){
+						biggestRadius = useThisRadius;
+					}
+					
+					totalBlocks++;
+				}			
+			}
+		}
+	}
+	if( e.currentTarget.y > 250 ){
+		e.currentTarget.removeEventListener( Event.ENTER_FRAME , blockDropLogic );
+		removeChild( DisplayObject( e.currentTarget ) );
+		blockSprites.splice( e.currentTarget.blockAttributes.id , 1 );
+
+		newBlock = new MovieClip();
+		newBlock.blockAttributes = blockAttributes;
+		newBlock.blockAttributes.id = blockSprites.length - 1;
+		//rnum = (Math.random()*20)+90;
+		aang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , 150 , rnum , 0 );
+		bang = obtainAngle( -110 - World1.rotation , -70 - World1.rotation , 150 , rnum , 1 );
+		drawCurvedBlock( newBlock , 0 , 0 , 150 , aang , bang ,	40 , 0x3C3C3C );
+		newBlock.alpha = 0.5;			
+		blockSprites.push(newBlock);
+		World1.addChild(blockSprites[blockSprites.length-1]);
+			
+		corner = new corner_;
+		corner.cornerAttributes = cornerAttributes;
+		corner.cornerAttributes.name = "c" + totalCorners.toString();
+		corner.cornerAttributes.r = 150;
+		corner.x = newBlock.blockAttributes.lcorner.x;
+		corner.y = newBlock.blockAttributes.lcorner.y;
+		corners.push(corner)
+		World1.addChild(corners[corners.length -1]);
+		totalCorners++;
+			
+		corner = new corner_;
+		corner.cornerAttributes = cornerAttributes;
+		corner.cornerAttributes.name = "c" + totalCorners.toString();
+		corner.cornerAttributes.r = 150;
+		corner.x = newBlock.blockAttributes.rcorner.x;
+		corner.y = newBlock.blockAttributes.rcorner.y;
+		corners.push(corner)
+		World1.addChild(corners[corners.length -1]);
+		totalCorners++;
+			
+		totalBlocks++;
+	}	
+}
+
+function addBlock(e:Event):void {
+	
+	blockCounter++;
+	if(blockCounter >= nextBlock && oneTimeBool == true){
+		prompt = true;
+		promptSprite = new MovieClip();
+		drawSquareBlock( promptSprite, 100, 40 , 0.5 , 0x3C3C3C );
+		promptSprite.x = 400;
+		promptSprite.y = 45;
+		addChild(promptSprite);
+		oneTimeBool = false;
+	}
+	
+}
+function drawSquareBlock( s:MovieClip, w:Number, h:Number, a:Number, c:uint=0x0 ){
+	graphics.lineStyle( 2 , 0x000000 );
+	s.graphics.beginFill( c , a );
+	s.graphics.moveTo( -w/2 , -h/2 );
+	s.graphics.lineTo( w/2 , -h/2 );
+	s.graphics.lineTo( w/2 , h/2 );
+	s.graphics.lineTo( -w/2 , h/2 );
+	s.graphics.lineTo( -w/2 , -h/2 );
+	s.graphics.endFill(  );
+}
+
+function promptBlock(e:Event):void {
+	if(prompt == true){
+		smallCount ++;
+		
+		if(smallCount >= 0 && smallCount <= 10){
+			promptSprite.visible = true;
+		} else {
+			promptSprite.visible = false;
+			largeCount ++;
+			if(largeCount % 10 == 0){
+				smallCount = -1;
+			}
+		}
+		if(largeCount == 30){
+			largeCount =0;
+			prompt = false;
+			smallCount = -1;
+			nextBlock = (Math.random()*90)+30;
+			removeChild(promptSprite);
+			oneTimeBool = true;
+			blockCounter = 0;
+			addNewBlock = true;
+		}
+	}	
+}
+
+function drawCurvedBlock(target:MovieClip, x:Number, y:Number, r:Number, s:Number, e:Number, h:Number, color:uint=0x0):void {
+        // More efficient to work in radians
+        var degreesPerRadian:Number = Math.PI / 180;
+        s *= degreesPerRadian;
+        e *= degreesPerRadian;
+		var S = e;
+		var E = s;
+	
+        // Draw the segment
+        target.graphics.beginFill(color,1); // second parameter is alpha
+        target.graphics.moveTo(x + r * Math.cos(s), y + r * Math.sin(s));
+        for (var t:Number = s; t < e; t += 0.1) {
+            target.graphics.lineTo(x + (r+h) * Math.cos(t), y + (r+h) * Math.sin(t));
+        }
+        target.graphics.lineTo(x + (r+h) * Math.cos(e), y + (r+h) * Math.sin(e));
+		target.graphics.lineTo(x + r * Math.cos(e), y + r * Math.sin(e));
+		
+		for (var u:Number = S; u > E; u -= 0.1) {
+            target.graphics.lineTo(x + r * Math.cos(u), y + r * Math.sin(u));
+        }
+		target.blockAttributes.lcorner = { x: x + (r+h) * Math.cos(s) , y: y + (r+h) * Math.sin(s) };
+		target.blockAttributes.rcorner = { x: x + (r+h) * Math.cos(e) , y: y + (r+h) * Math.sin(e) };
+		target.blockAttributes.r = r;
+		//trace(target.blockAttributes.lcorner);
+		target.graphics.endFill();
+};
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Last Script" color="#9933CC" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import flash.events.Event;
+
+stage.addEventListener(Event.ENTER_FRAME, MonitorGameState);
+
+function MonitorGameState(e:Event):void {
+	if(changeMade == true){
+		player.playerAttributes.rotationSpeed = Number(editorMenu.textPlayerSpeed.text);
+		player.playerAttributes.angleSpeed = Number(editorMenu.textPlayerSpeed.text);
+		World1.worldAttributes.mass = Number(editorMenu.textWorldMass.text);
+		changeMade = false;
+	}
+}
+
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Math Script" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[function AngleToRadians( x ){
+	
+	var y = x * Math.PI / 180;
+	return y;
+	
+}
+function RadiansToAngle( x ){
+	
+	var y = x / (Math.PI / 180 );
+	return y;
+}
+
+function doThis( x ){
+	if(x<0){ x=x*-1; }
+	var y = 360 - x;
+	return y;
+}
+function doThat( x ){
+	var y = x - 360;
+	return y;
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <persistentData>
+          <PD n="DebugMovieChecked" v="FlashPro"/>
+     </persistentData>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="21385" publishTime="1469743713" publishDebug="true"/>
+          <PublishItem publishSize="21385" publishTime="1469742278" publishDebug="true"/>
+          <PublishItem publishSize="11631" publishTime="1468539242" publishDebug="true"/>
+          <PublishItem publishSize="11619" publishTime="1468539199" publishDebug="true"/>
+          <PublishItem publishSize="11629" publishTime="1468539127" publishDebug="true"/>
+          <PublishItem publishSize="11619" publishTime="1468538990" publishDebug="true"/>
+          <PublishItem publishSize="11620" publishTime="1468537172" publishDebug="true"/>
+          <PublishItem publishSize="11626" publishTime="1468534598" publishDebug="true"/>
+          <PublishItem publishSize="11609" publishTime="1468534097" publishDebug="true"/>
+          <PublishItem publishSize="11611" publishTime="1468534085" publishDebug="true"/>
+          <PublishItem publishSize="11611" publishTime="1468534074" publishDebug="true"/>
+          <PublishItem publishSize="11613" publishTime="1468534051" publishDebug="true"/>
+          <PublishItem publishSize="11599" publishTime="1468533932" publishDebug="true"/>
+          <PublishItem publishSize="11598" publishTime="1468533906" publishDebug="true"/>
+          <PublishItem publishSize="11598" publishTime="1468533891" publishDebug="true"/>
+          <PublishItem publishSize="11610" publishTime="1468533592" publishDebug="true"/>
+          <PublishItem publishSize="11611" publishTime="1468533457" publishDebug="true"/>
+          <PublishItem publishSize="11628" publishTime="1468533007" publishDebug="true"/>
+          <PublishItem publishSize="11626" publishTime="1468532688" publishDebug="true"/>
+          <PublishItem publishSize="11625" publishTime="1468532340" publishDebug="true"/>
+     </publishHistory>
+</DOMDocument>
